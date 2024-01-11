@@ -18,12 +18,15 @@ class Toys(db.Model, SerializerMixin):
     name = db.Column(db.String)
     image = db.Column(db.String)
     likes = db.Column(db.Integer)
-    user= db.Column(db.String)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user_table.id'))
+    user = db.relationship('Users', back_populates='toys')
 
 class Users(db.Model, SerializerMixin):
     __tablename__ = "user_table"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    toys = db.Column(db.String)
+    
+    toys = db.relationship('Toys', back_populates='user')
 
 

@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
         toy_list = []
         for toy in data["toys"]:
-            t = Toys(name=toy.get('name'), image=toy.get('image'), likes=toy.get('likes'))
+            t = Toys(name=toy.get('name'), image=toy.get('image'), likes=toy.get('likes'), user_id=toy.get('user_id'))
             toy_list.append(t)
 
         db.session.add_all(toy_list)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
         user_list = []
         for user in data["users"]:
-            u = Users(name=user.get('name'), toys=user.get('toys'))
+            u = Users(name=user.get('name'))
             user_list.append(u)
 
         db.session.add_all(user_list)
