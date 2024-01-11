@@ -2,7 +2,7 @@ from flask import Flask, make_response, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import datetime
-from models import db, Toys
+from models import db, Toys, Users
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -25,6 +25,13 @@ def get_toys():
     toys = Toys.query.all()
     #convert each nested python object into json
     return [toy.to_dict() for toy in toys]
+
+@app.get('/users/')
+def get_users():
+    #python object
+    users = Users.query.all()
+    #convert each nested python object into json
+    return [user.to_dict() for user in users]
 
 @app.get('/toys/<int:id>')
 def get_toys_by_id(id):

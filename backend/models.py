@@ -18,5 +18,12 @@ class Toys(db.Model, SerializerMixin):
     name = db.Column(db.String)
     image = db.Column(db.String)
     likes = db.Column(db.Integer)
+    user= db.Column(db.String)
+
+class Users(db.Model, SerializerMixin):
+    __tablename__ = "user_table"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    toys = db.Column(db.String)
 
 
