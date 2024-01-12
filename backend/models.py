@@ -14,6 +14,7 @@ db = SQLAlchemy(metadata=metadata)
 
 class Toys(db.Model, SerializerMixin):
     __tablename__ = "toy_table"
+   
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     image = db.Column(db.String)
@@ -24,6 +25,7 @@ class Toys(db.Model, SerializerMixin):
 
 class Users(db.Model, SerializerMixin):
     __tablename__ = "user_table"
+    serialize_rules = ['-toys.user']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     
