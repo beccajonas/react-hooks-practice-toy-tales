@@ -50,6 +50,8 @@ def logout():
 
 @app.get('/users/<int:id>/toys')
 def get_toys_for_user(id):
+    print("get toys")
+    print(session.get('user_id'))
     #python object
     user = db.session.get(Users, id)
     #convert each nested python object into json
@@ -90,7 +92,9 @@ def delete_toys(id):
 @app.post('/toys')
 def post_toys():
     data = request.json
-    new_toy = Toys(name=data['name'], image=data['image'], likes=0)
+    print()
+    print(session.get('user_id'))
+    new_toy = Toys(name=data['name'], image=data['image'], likes=0, user_id=session.get("user_id"))
     db.session.add(new_toy)
     db.session.commit()
     return new_toy.to_dict()
