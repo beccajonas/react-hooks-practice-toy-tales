@@ -14,6 +14,7 @@ db = SQLAlchemy(metadata=metadata)
 
 class Toys(db.Model, SerializerMixin):
     __tablename__ = "toy_table"
+    serialize_rules = ['-user']
    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -28,6 +29,7 @@ class Users(db.Model, SerializerMixin):
     serialize_rules = ['-toys.user']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    password_hash = db.Column(db.String)
     
     toys = db.relationship('Toys', back_populates='user')
 

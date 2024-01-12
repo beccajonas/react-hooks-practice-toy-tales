@@ -3,16 +3,66 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import ToyForm from "./ToyForm";
 import ToyContainer from "./ToyContainer";
+import Login from "./Login";
+import UserDetails from "./UserDetails";
 
 function App() {
+  const [user, setUser] = useState(null)
   const [showForm, setShowForm] = useState(false);
   const [toys, setToys] = useState([]);
 
+    /**********************
+        Initial Fetches
+    ************************/
+
   useEffect(() => {
-    fetch("http://localhost:5555/toys")
+    fetch(`/check_session`).then((res) => {
+        if (res.ok) {
+            res.json().then((user) => setUser(user));
+        }
+    });
+  }, []);
+
+  useEffect(() => 
+  {if (user) {
+    fetch(`/users/${user.id}/toys`)
       .then((r) => r.json())
       .then(setToys);
-  }, []);
+    }
+  }, [user]);
+
+    /**********************
+        Authentication
+    ************************/
+  function attemptLogin(userInfo) {
+    fetch(`/login`, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          Accepts: "application/json",
+      },
+      body: JSON.stringify(userInfo),
+    })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      throw res;
+    })
+    .then(data => setUser(data))
+    .catch(e => console.log(e));
+  }
+
+  function logout() {
+    fetch(`/logout`, {
+      method: "DELETE"
+    })
+    .then(res => {
+      if (res.ok) {
+        setUser(null)
+      }
+    })
+  }
 
   function handleClick() {
     setShowForm((showForm) => !showForm);
@@ -35,18 +85,25 @@ function App() {
   }
 
   return (
-    <>
-      <Header />
-      {showForm ? <ToyForm onAddToy={handleAddToy} /> : null}
-      <div className="buttonContainer">
-        <button onClick={handleClick}>Add a Toy</button>
-      </div>
-      <ToyContainer
-        toys={toys}
-        onDeleteToy={handleDeleteToy}
-        onUpdateToy={handleUpdateToy}
-      />
-    </>
+    <div>
+      {user ? (
+      <>
+        <Header />
+        <UserDetails currentUser={user} logout={logout} />
+        {showForm ? <ToyForm onAddToy={handleAddToy} /> : null}
+        <div className="buttonContainer">
+          <button onClick={handleClick}>Add a Toy</button>
+        </div>
+        <ToyContainer
+          toys={toys}
+          onDeleteToy={handleDeleteToy}
+          onUpdateToy={handleUpdateToy}
+        />
+      </>
+      ) : (
+        <Login attemptLogin={attemptLogin} />
+    )}
+    </div>
   );
 }
 

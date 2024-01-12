@@ -1,30 +1,59 @@
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import datetime
 from models import db, Toys, Users
 from flask_cors import CORS
+from dotenv import dotenv_values
+from flask_bcrypt import Bcrypt
+config = dotenv_values(".env")
 
 app = Flask(__name__)
+app.secret_key = config['FLASK_SECRET_KEY']
 CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.json.compact = False
-
+bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
 
 db.init_app(app)
+
 
 @app.get('/')
 def index():
     return "toy backend"
 
-@app.get('/toys/')
-def get_toys():
+@app.get('/check_session')
+def check_session():
+    user = db.session.get(Users, session.get('user_id'))
+    print('check session')
+    if user:
+        return user.to_dict(rules=['password_hash']), 200
+    else:
+        return {"message": "No user logged in"}, 401
+    
+@app.post('/login')
+def login():
+    data = request.json
+    user = Users.query.filter(Users.name == data.get('name')).first()
+    if user and bcrypt.check_password_hash(user.password_hash, data.get('password')): #?
+        session["user_id"] = user.id
+        return user.to_dict(), 200
+    else:
+        return { "error": "Invalid username or password" }, 401
+    
+@app.delete('/logout')
+def logout():
+    session.pop('user_id')
+    return {"message": "logged out"}, 200
+
+@app.get('/users/<int:id>/toys')
+def get_toys_for_user(id):
     #python object
-    toys = Toys.query.all()
+    user = db.session.get(Users, id)
     #convert each nested python object into json
-    return [toy.to_dict() for toy in toys]
+    return [t.to_dict() for t in user.toys]
 
 @app.get('/users/')
 def get_users():

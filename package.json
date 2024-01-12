@@ -2,6 +2,7 @@
   "name": "react-hooks-practice-toy-tales",
   "version": "0.1.0",
   "private": true,
+  "proxy":"http://localhost:5555",
   "dependencies": {
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

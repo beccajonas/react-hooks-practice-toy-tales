@@ -1,9 +1,13 @@
 from app import app
 from models import Toys, Users, db
 import json
+from flask_bcrypt import Bcrypt
+import random
+
 
 if __name__ == '__main__':
     with app.app_context():
+        bcrypt = Bcrypt(app)
         data = {}
         with open ("db.json") as f:
             data = json.load(f)
@@ -12,7 +16,11 @@ if __name__ == '__main__':
 
         toy_list = []
         for toy in data["toys"]:
-            t = Toys(name=toy.get('name'), image=toy.get('image'), likes=toy.get('likes'), user_id=toy.get('user_id'))
+            t = Toys(name=toy.get('name'), 
+                    image=toy.get('image'), 
+                    likes=toy.get('likes'), 
+                    user_id=toy.get('user_id'), 
+                    )
             toy_list.append(t)
 
         db.session.add_all(toy_list)
@@ -20,7 +28,7 @@ if __name__ == '__main__':
 
         user_list = []
         for user in data["users"]:
-            u = Users(name=user.get('name'))
+            u = Users(name=user.get('name'), password_hash=bcrypt.generate_password_hash(user.get('password_hash')))
             user_list.append(u)
 
         db.session.add_all(user_list)
